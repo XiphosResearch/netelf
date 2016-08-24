@@ -1,2 +1,2 @@
-client_memfd
-client_shm
+netelf
+*.swp

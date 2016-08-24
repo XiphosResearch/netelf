@@ -1,12 +1,9 @@
 CFLAGS=-Os -s -fomit-frame-pointer -Wall -pedantic
 
-all: client_shm client_memfd
+all: netelf
 
-client_shm: client_shm.c
+netelf: netelf.c
 	$(CC) $(CFLAGS) -o $@ $^ -lrt
 
-client_memfd: client_memfd.c
-	$(CC) $(CFLAGS) -o $@ $^
-
 clean:
-	rm -f client_memfd client_shm
+	rm -f netelf
