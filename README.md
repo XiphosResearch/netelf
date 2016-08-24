@@ -4,8 +4,8 @@ I ported that to use sockets and leave no file in `/dev/shm`, run with:
 
 ```
 make
-./server /bin/ls &
-./netelf
+./server.py 127.0.0.1 1337 /bin/ls ls -la &
+./netelf 127.0.0.1 1337 
 ```
 
 Then I looked into the source code for glibc and musl to see what goes on behind the scenes, interesting shit, it executes the file from `/proc/self/fd/%d` - this could make writing shellcode easier. Combine with [findsock.c](findsock.c) - it then does dup2() to bind the socket to stdin/out/err so the called executable can just use stdin & stdout as usual...
@@ -29,7 +29,7 @@ probably because the `shm_open` succeeded, but silently the file descriptor didn
 
 Regarding which executables will work with this technique, the most reliable have been self-contained, statically linked executables. In some cases (where the same libc was used on the host used to compile the executable and on the host it is being executed on, and where both have the same libraries/dependencies), dynamically linked executables have worked. Executables which rely on specific environments or external files generally tend to fail.
 
-A further caveat is that as of this time, it is not possible to supply commandline arguments to the executable being executed. This will be fixed in a future release.
+Furthermore, it is possible to pass arguments to the executable you are running in-memory! You MUST pass at least one (argv[0]), which you can just set to anything, in the server.py currently. In the example above, this is "ls". Further arguments will also be passed along.
 
 
 [comp.unix.programmer]: https://groups.google.com/forum/message/raw?msg=comp.unix.programmer/V1M97GBxIXo/6JQtqmpHSsQJ
