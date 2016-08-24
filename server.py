@@ -19,7 +19,7 @@ def run_server(filedata, ip, port):
 				print("[+] Sending payload (%d bytes) to %r" % (
 					len(filedata), client_addr,))
 				try:
-					conn.sendall(pack('<i', len(filedata)))
+					conn.sendall(pack('!I', len(filedata)))
 					conn.sendall(filedata)
 				finally:
 					conn.close()

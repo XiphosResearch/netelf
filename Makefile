@@ -1,4 +1,4 @@
-CFLAGS=-Os -s -fomit-frame-pointer
+CFLAGS=-Os -s -fomit-frame-pointer -Wall -pedantic
 
 all: client_shm client_memfd
 

@@ -5,6 +5,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <string.h>
+#include <stdint.h>
 
 #include "memfd.h"
 
@@ -38,19 +39,18 @@ sock_connect( const char *ip, int port ) {
     return sockfd;
 }
 
-static int
+static uint32_t
 sock_readint( int sockfd ) {
-    int ret = -1;
-    // XXX: bigendian systems...
-    if( read(sockfd, &ret, sizeof(ret)) != sizeof(ret) ) {
-        return -1;
+    uint32_t ret = 0;
+    if( read(sockfd, &ret, 4) != 4 ) {
+        return 0;
     }
-    return ret;
+    return ntohl(ret);
 }
 
 
 static int
-sock_exec( int sockfd, int nbytes )
+sock_exec( int sockfd, uint32_t nbytes )
 {
     char *ptr, *buf;
     int shm_fd, rc, nbread = 0;
@@ -109,8 +109,8 @@ main( int argc, char **argv ) {
         return 2;
     }
 
-    int nbytes = sock_readint(sockfd);
-    printf("Reading %d bytes\n", nbytes);
+    uint32_t nbytes = sock_readint(sockfd);
+    printf("Reading %u bytes\n", nbytes);
     if( nbytes > 0 ) {
         rc = sock_exec(sockfd, nbytes);
     }
