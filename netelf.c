@@ -167,7 +167,7 @@ sock_exec( int sockfd )
 int
 main( int argc, char **argv ) {
     const char *ip_addr = "127.0.0.1";
-    int port = 38248;
+    int port = 1337;
     int rc = -1;
     if( argc > 1 ) {
         ip_addr = argv[1];
