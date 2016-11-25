@@ -1,4 +1,9 @@
-CFLAGS=-Os -s -fomit-frame-pointer -Wall -pedantic
+CFLAGS = -Wall -pedantic
+ifdef DEBUG
+CFLAGS += -O0 -ggdb
+else
+CFLAGS += -Os -s -fomit-frame-pointer
+endif
 
 all: netelf
 

@@ -52,7 +52,7 @@ def main(args):
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('--name', metavar='name', type=str, default=None,
                         help='Program name (argv[0])', nargs=1)
-    parser.add_argument('--ip', metavar='ip', type=str, default="127.0.0.1",
+    parser.add_argument('--ip', metavar='ip', type=str, default=["127.0.0.1"],
                         help='TCP listen ip', nargs=1)
     parser.add_argument('--port', metavar='port', type=int, default=1337,
                         help='TCP listen port', nargs=1)
@@ -62,6 +62,8 @@ def main(args):
 
     prog_name = os.path.basename(args.name if args.name else args.cmd[0])
     args.argv.insert(0, prog_name)
+
+    args.ip = args.ip[0]
 
     print("IP:   ", args.ip)
     print("Port: ", args.port)
