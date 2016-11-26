@@ -1,8 +1,7 @@
-CFLAGS = -Wall -pedantic
 ifdef DEBUG
-CFLAGS += -O0 -ggdb
+CFLAGS = -O0 -ggdb
 else
-CFLAGS += -Os -s -fomit-frame-pointer
+CFLAGS = -Os -s -fomit-frame-pointer
 endif
 
 all: netelf

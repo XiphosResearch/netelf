@@ -1,2 +1,8 @@
 netelf
 *.swp
+*.obj
+*.sln
+*.vcxproj
+*.vcxproj.*
+/Debug/
+/Release/

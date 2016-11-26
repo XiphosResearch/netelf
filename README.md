@@ -11,18 +11,18 @@ Originally inspired by a post on [this post on comp.unix.programmer](https://gro
 Fully supported & tested:
 
  * Linux 
- * OpenVMS
+ * OpenVMS VAX
+ * Ultrix VAX
+ * Windows
 
 Others that it should work on
 
  * FreeBSD
  * OSX
  * OSF/1
- * POSIX compatible
-
-In progress:
-
- * Windows
+ * HP-UX
+ * QNX
+ * z/OS
 
 ## Example
 
