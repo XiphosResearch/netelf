@@ -13,7 +13,7 @@
 #endif
 
 #pragma comment(lib, "kernel32.lib")
-#pragma comment(lib, "Ws2_32.lib")
+#pragma comment(lib, "wsock32.lib")
 #include <windows.h>
 
 
@@ -38,6 +38,9 @@ file_open(file)
 	ne_file_t *file;
 {
 	TCHAR lpTempPathBuffer[MAX_PATH];
+	DWORD dwShareMode;
+	DWORD dwFlagsAndAttributes;
+	HANDLE hFile;
 
 	if (!GetTempPath(MAX_PATH, lpTempPathBuffer))
 		return 1;
@@ -45,9 +48,9 @@ file_open(file)
 	if (!GetTempFileName(lpTempPathBuffer, NULL, 0, file->name))
 		return 2;
 
-	DWORD dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
-	DWORD dwFlagsAndAttributes = FILE_ATTRIBUTE_TEMPORARY;
-	HANDLE hFile = CreateFile(file->name, GENERIC_WRITE, dwShareMode, NULL, OPEN_EXISTING, dwFlagsAndAttributes, NULL);
+	dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
+	dwFlagsAndAttributes = FILE_ATTRIBUTE_TEMPORARY;
+	hFile = CreateFile(file->name, GENERIC_WRITE, dwShareMode, NULL, OPEN_EXISTING, dwFlagsAndAttributes, NULL);
 	if (hFile == INVALID_HANDLE_VALUE)
 		return 3;
 
@@ -76,6 +79,7 @@ file_exec(file, argv)
 	STARTUPINFO startInfo;
 	PROCESS_INFORMATION processInfo;
 	DWORD dwFlags = 0;
+	BOOL ret;
 
 	ZeroMemory(&startInfo, sizeof(startInfo));
 	ZeroMemory(&processInfo, sizeof(processInfo));
@@ -89,8 +93,8 @@ file_exec(file, argv)
 #endif
 
 	CloseHandle(file->handle);
-	BOOL ret = CreateProcessA(file->name, NULL, NULL, NULL, FALSE,
-							  dwFlags, NULL, NULL, &startInfo, &processInfo);
+	ret = CreateProcessA(file->name, NULL, NULL, NULL, FALSE,
+					     dwFlags, NULL, NULL, &startInfo, &processInfo);
 #ifndef QUIET
 	if (!ret) {
 		perror("CreateProcessA");

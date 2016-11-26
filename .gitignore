@@ -1,4 +1,6 @@
 netelf
+*.log
+*.pid
 *.swp
 *.obj
 *.sln

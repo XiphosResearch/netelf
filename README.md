@@ -13,7 +13,7 @@ Fully supported & tested:
  * Linux 
  * OpenVMS VAX
  * Ultrix VAX
- * Windows
+ * Windows 95+, NT 3.51+
 
 Others that it should work on
 
