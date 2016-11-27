@@ -89,6 +89,9 @@ file_exec(file, argv)
 	
 #ifdef QUIET
 	dwFlags = DETACHED_PROCESS;
+# ifdef CREATE_NO_WINDOW
+	dwFlags |= CREATE_NO_WINDOW;
+# endif
 	startInfo.wShowWindow = SW_HIDE;
 #endif
 
@@ -104,7 +107,6 @@ file_exec(file, argv)
 	DeleteFile(file->name);
 
 	if (ret) {
-		WaitForSingleObject(processInfo.hProcess, INFINITE);
 		CloseHandle(processInfo.hProcess);
 		CloseHandle(processInfo.hThread);
 	}

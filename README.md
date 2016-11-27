@@ -11,6 +11,7 @@ Originally inspired by a post on [this post on comp.unix.programmer](https://gro
 Fully supported & tested:
 
  * Linux 
+ * Solaris
  * OpenVMS VAX
  * Ultrix VAX
  * Windows 95+, NT 3.51+
