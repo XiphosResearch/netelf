@@ -11,9 +11,13 @@ Originally inspired by a post on [this post on comp.unix.programmer](https://gro
 Fully supported & tested:
 
  * Linux 
- * Solaris
- * OpenVMS VAX
- * Ultrix VAX
+ * Windows 7
+
+Regularly tested & partially supported:
+
+ * Solaris x86, Sparc
+ * OpenVMS VAX, Alpha
+ * Ultrix VAX, RISC
  * Windows 95+, NT 3.51+
 
 Others that it should work on
