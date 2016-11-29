@@ -3,13 +3,12 @@
 
 #ifdef NODEFAULTLIB
 # define QUIET
+# define NEED_STRCHR
 # define NEED_MEMSET
 # define NEED_WIN32_MALLOC_FREE
 # define NETELF_NEED_LIB_C
 #else
-# ifdef __POCC__
-#  include <stdio.h>
-# endif
+# include <stdio.h>
 #endif
 
 #pragma comment(lib, "kernel32.lib")
@@ -22,16 +21,22 @@ void *malloc(size_t size) {
 	return HeapAlloc(GetProcessHeap(), 0, size);
 }
 
+void *realloc(void *ptr, size_t new_size) {
+	return HeapReAlloc(GetProcessHeap(), 0, ptr, new_size);
+}
+
 void free(void *ptr) {
 	HeapFree(GetProcessHeap(), 0, ptr);
 }
 #endif
+
 
 struct ne_file_s {
 	TCHAR name[MAX_PATH];
 	HANDLE handle;
 };
 typedef struct ne_file_s ne_file_t;
+
 
 static int
 file_open(file)
@@ -70,16 +75,78 @@ file_write(file, buf, nbytes)
 	return byteswritten;
 }
 
+// https://blogs.msdn.microsoft.com/twistylittlepassagesallalike/2011/04/23/everyone-quotes-command-line-arguments-the-wrong-way/
+static char *
+argv_to_cmdline( unsigned int argc, char **argv ) {
+#define EMITN(x,n) do { unsigned _i; for (_i = 0; _i < (n); _i++) dst[sofar++] = x; } while (0)
+#define EMIT(x) EMITN(x,1)
+#define EMITALL do { unsigned _i = 0; while (arg[_i]) dst[sofar++] = arg[_i++]; } while (0)
+	char *dst = malloc(1024 * 32);
+	size_t sofar = 0;
+	size_t argIndex;
+
+	for( argIndex = 0; argIndex < argc; ++argIndex ) {
+		const char *arg = argv[argIndex];
+		if( ! arg )
+			break;
+
+		if( argIndex )
+			EMIT(' ');
+		const int quote =
+			strchr(arg, ' ') != NULL ||
+			strchr(arg, '"') != NULL ||
+			strchr(arg, '\t') != NULL ||
+			strchr(arg, '\v') != NULL ||
+			*arg == '\0';
+		if( ! quote ) {
+			EMITALL;
+			continue;
+		}
+
+		EMIT('"');
+		for( const char *It = arg; ; ++It ) {
+			unsigned NumberBackslashes = 0;
+			while( *It && *It == '\\' ) {
+				++It;
+				++NumberBackslashes;
+			}
+
+			if( ! *It ) {
+				EMITN('\\', NumberBackslashes * 2);
+				break;
+			}
+			else if( *It == '"' ) {
+				EMITN('\\', NumberBackslashes * 2 + 1);
+				EMIT(*It);
+			}
+			else {
+				EMITN('\\', NumberBackslashes);
+				EMIT(*It);
+			}
+		}
+
+		EMIT('"');
+	}
+	EMIT('\0');
+	return dst;
+
+#undef EMIT
+#undef EMITN
+#undef EMITALL
+}
+
 
 static int
-file_exec(file, argv)
+file_exec(file, argc, argv)
 	ne_file_t *file;
+	unsigned int argc;
 	char **argv;
 {
 	STARTUPINFO startInfo;
 	PROCESS_INFORMATION processInfo;
 	DWORD dwFlags = 0;
 	BOOL ret;
+	char *cmdline = argv_to_cmdline(argc, argv);
 
 	ZeroMemory(&startInfo, sizeof(startInfo));
 	ZeroMemory(&processInfo, sizeof(processInfo));
@@ -96,8 +163,8 @@ file_exec(file, argv)
 #endif
 
 	CloseHandle(file->handle);
-	ret = CreateProcessA(file->name, NULL, NULL, NULL, FALSE,
-					     dwFlags, NULL, NULL, &startInfo, &processInfo);
+	ret = CreateProcessA(file->name, cmdline, NULL, NULL, FALSE, dwFlags,
+						 NULL, NULL, &startInfo, &processInfo);
 #ifndef QUIET
 	if (!ret) {
 		perror("CreateProcessA");

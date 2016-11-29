@@ -53,4 +53,4 @@ This causes `fexecve: Permission denied` because the `shm_open` succeeded, but s
 
 Regarding which executables will work with this technique, the most reliable have been self-contained, statically linked executables. In some cases (where the same libc was used on the host used to compile the executable and on the host it is being executed on, and where both have the same libraries/dependencies), dynamically linked executables have worked. Executables which rely on specific environments or external files generally tend to fail.
 
-Furthermore, it is possible to pass arguments to the executable you are running in-memory! The name of the process is derived from `argv[0]`, this can be customised using `--name [kthreadd]`. By default it will use the `basename` of the executable file.
+Furthermore, it is possible to pass arguments to the executable you are running in-memory! The name of the process is derived from `argv[0]`, this can be customised using `--argv0 [kthreadd]`. By default it will use the `basename` of the executable file.

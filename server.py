@@ -50,8 +50,9 @@ def run_server(filedata, args):
 
 def main(args):
     parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument('--name', metavar='name', type=str, default=None,
+    parser.add_argument('--argv0', metavar='name', type=str, default=None,
                         help='Program name (argv[0])', nargs=1)
+    parser.add_argument('--no-argv0', action='store_true')
     parser.add_argument('--ip', metavar='ip', type=str, default=["127.0.0.1"],
                         help='TCP listen ip', nargs=1)
     parser.add_argument('--port', metavar='port', type=int, default=1337,
@@ -60,8 +61,9 @@ def main(args):
     parser.add_argument('argv', nargs='*', help='command arguments')
     args = parser.parse_args()
 
-    prog_name = os.path.basename(args.name if args.name else args.cmd[0])
-    args.argv.insert(0, prog_name)
+    prog_name = os.path.basename(args.argv0[0] if args.argv0 else args.cmd[0])
+    if not args.no_argv0:
+        args.argv.insert(0, prog_name)
 
     args.ip = args.ip[0]
 

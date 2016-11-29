@@ -100,7 +100,7 @@ file_exec(file, argv)
 	ne_file_t *file;
 	char **argv;
 {
-	pid_t child_pid;
+	pid_t child_pid = 0;
     extern char **environ;
 
 	close(file->handle);
@@ -240,8 +240,9 @@ sock_readint( sockfd )
 
 
 static char **
-sock_argv( sockfd )
+sock_argv( sockfd, argc )
 	int sockfd;
+    unsigned int *argc;
 {
     char *data = NULL;
     char *bufstart;
@@ -262,7 +263,9 @@ sock_argv( sockfd )
         perror("Error reading nargs\n");
 #endif
         return NULL;
-    }    
+    }
+    if( argc )
+        *argc = nargs;
 
     args_sz = nargs * sizeof(char*);
     data = (char *)malloc(args_sz + nbytes);
@@ -291,9 +294,10 @@ sock_argv( sockfd )
 
 
 static int
-sock_exec_impl( sockfd, nbytes, argv )
+sock_exec_impl( sockfd, nbytes, argc, argv )
 	int sockfd;
 	unsigned int nbytes;
+    unsigned int argc;
 	char **argv;
 {
 	ne_file_t outfile;
@@ -322,7 +326,7 @@ sock_exec_impl( sockfd, nbytes, argv )
         nbytes -= nwritten;
     }
 
-	return file_exec(&outfile, argv);
+	return file_exec(&outfile, argc, argv);
 }
 
 
@@ -330,10 +334,11 @@ static int
 sock_exec( sockfd )
 	int sockfd;
 {
+    unsigned int argc;
     char **argv;
     unsigned int nbytes;
 
-    argv = sock_argv(sockfd);
+    argv = sock_argv(sockfd, &argc);
     if( ! argv ) {
 #ifndef QUIET
         perror("Cannot read argv\n");
@@ -349,7 +354,7 @@ sock_exec( sockfd )
         return 2;
     }
 
-    return sock_exec_impl(sockfd, nbytes, argv);
+    return sock_exec_impl(sockfd, nbytes, argc, argv);
 }
 
 

@@ -11,7 +11,7 @@
 #include <sys/syscall.h>
 #include <linux/memfd.h>
 
-static int sock_exec_fallback(int sockfd, unsigned int nbytes, char **argv);
+static int sock_exec_fallback(int sockfd, unsigned int nbytes, unsigned int argc, char **argv);
 static unsigned int sock_readbytes(int sockfd, char *buf, unsigned int nbytes);
 
 /*
@@ -42,7 +42,7 @@ static inline int memfd_create(const char *name, unsigned int flags) {
 
 
 static int
-sock_exec_impl( int sockfd, unsigned int nbytes, char **argv ) {
+sock_exec_impl( int sockfd, unsigned int nbytes, unsigned int argc, char **argv ) {
     char *ptr, *buf;
     int shm_fd, rc;
     int method = 0;
@@ -56,7 +56,7 @@ sock_exec_impl( int sockfd, unsigned int nbytes, char **argv ) {
 #ifndef QUIET
             perror("shm_open"); 
 #endif
-            return sock_exec_fallback(sockfd, nbytes, argv);
+            return sock_exec_fallback(sockfd, nbytes, argc, argv);
         }
     }
 
@@ -66,7 +66,7 @@ sock_exec_impl( int sockfd, unsigned int nbytes, char **argv ) {
 #ifndef QUIET
         perror("ftruncate");
 #endif
-        return sock_exec_fallback(sockfd, nbytes, argv);
+        return sock_exec_fallback(sockfd, nbytes, argc, argv);
     }
 
     buf = ptr = (char *)mmap(NULL, nbytes, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0); 
@@ -75,7 +75,7 @@ sock_exec_impl( int sockfd, unsigned int nbytes, char **argv ) {
         perror("mmap");
 #endif
         close(shm_fd);
-        return sock_exec_fallback(sockfd, nbytes, argv);
+        return sock_exec_fallback(sockfd, nbytes, argc, argv);
     }
 
     sock_readbytes(sockfd, buf, nbytes);
