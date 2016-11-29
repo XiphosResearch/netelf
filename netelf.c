@@ -151,11 +151,7 @@ sock_connect( ip, port )
     if( sockfd < 0 )
         return sockfd;
 
-#ifdef _WIN32
-	ZeroMemory(&serv_addr, sizeof(serv_addr));
-#else
     memset(&serv_addr, 0, sizeof(serv_addr));
-#endif
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(port);
 

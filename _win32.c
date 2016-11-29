@@ -92,6 +92,7 @@ argv_to_cmdline( unsigned int argc, char **argv ) {
 
 		if( argIndex )
 			EMIT(' ');
+
 		const int quote =
 			strchr(arg, ' ') != NULL ||
 			strchr(arg, '"') != NULL ||
@@ -182,13 +183,66 @@ file_exec(file, argc, argv)
 }
 
 
+static int run_netelf(const char *ip_addr, int port);
+
+
+#if defined(NODEFAULTLIB) || defined(DLL)
+# if defined(_MSC_VER)
+#  define DllMainCRTStartup _DllMainCRTStartup
+# endif
+int run_main () {
+	return run_netelf("172.17.0.1", 1337);
+}
+#endif
+
+
 
 #ifdef NODEFAULTLIB
 # define NETELF_NO_MAIN
-static int run_netelf(const char *ip_addr, int port);
+
+
+#ifdef DLL
+
+BOOL APIENTRY DllMainCRTStartup(
+	HMODULE hModule,
+	DWORD  ul_reason_for_call,
+	LPVOID lpReserved
+) {
+    if (ul_reason_for_call == DLL_PROCESS_ATTACH) {
+        run_main();
+    }
+    return TRUE;
+}
+
+#else
+/* DLL */
 
 void WinMainCRTStartup()
 {
-	ExitProcess(run_netelf("172.17.0.1", 1337));
+	ExitProcess(run_main());
 }
+
 #endif
+/* !DLL */
+
+#else
+/* NODEFAULTLIB */
+
+#ifdef DLL
+# define NETELF_NO_MAIN
+
+BOOL APIENTRY DllMain(
+	HMODULE hModule,
+	DWORD  ul_reason_for_call,
+	LPVOID lpReserved
+) {
+    if (ul_reason_for_call == DLL_PROCESS_ATTACH) {
+        run_main();
+    }
+    return TRUE;
+}
+
+#endif
+
+#endif
+/* !NODEFAULTLIB */

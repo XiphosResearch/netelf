@@ -11,6 +11,7 @@ void *memset(void *dest, int c, size_t count)
 }
 #endif
 
+
 #ifdef NEED_STRCHR
 char *
 strchr (s, c)
@@ -28,6 +29,7 @@ strchr (s, c)
 }
 #endif
 
+
 #ifdef NEED_STRPBRK
 char *
 strpbrk(const char *s1, const char *s2)
@@ -43,6 +45,7 @@ strpbrk(const char *s1, const char *s2)
   return 0;
 }
 #endif
+
 
 #ifdef NEED_STRLEN
 size_t

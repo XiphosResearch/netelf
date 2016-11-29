@@ -4,10 +4,18 @@ else
 CFLAGS = -Os -s -fomit-frame-pointer
 endif
 
-all: netelf
+TARGETS=bin/netelf bin/test bin/test_loaddll
 
-netelf: netelf.c
+all: $(TARGETS)
+
+bin/netelf: netelf.c
 	$(CC) $(CFLAGS) -o $@ $^ -lrt
 
+bin/test: test.c
+	$(CC) $(CFLAGS) -o $@ $^
+
+bin/test_loaddll: test_loaddll.c
+	$(CC) $(CFLAGS) -o $@ $^
+
 clean:
-	rm -f netelf
+	rm -f $(TARGETS)
