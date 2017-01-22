@@ -15,7 +15,7 @@ bin/test: test.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 bin/test_loaddll: test_loaddll.c
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^ -ldl
 
 clean:
 	rm -f $(TARGETS)

@@ -9,7 +9,7 @@
 #define NETELF_OVERRIDE_SOCKEXEC
 
 #include <sys/syscall.h>
-#include <linux/memfd.h>
+
 
 static int sock_exec_fallback(int sockfd, unsigned int nbytes, unsigned int argc, char **argv);
 static unsigned int sock_readbytes(int sockfd, char *buf, unsigned int nbytes);
@@ -21,6 +21,10 @@ static unsigned int sock_readbytes(int sockfd, char *buf, unsigned int nbytes);
  * defined in the kernel header file <linux/fcntl.h>, that file as
  * a whole conflicts with the original glibc header <fnctl.h>.
  */
+
+/* flags for memfd_create(2) (unsigned int) */
+#define MFD_CLOEXEC     0x0001U
+#define MFD_ALLOW_SEALING   0x0002U
 
 static inline int memfd_create(const char *name, unsigned int flags) {
     return syscall(__NR_memfd_create, name, flags);
